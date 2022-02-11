@@ -6,7 +6,6 @@ labels: bug
 assignees: ''
 
 ---
-
 ## Description (Required)
 <!-- A clear and detailed description of what exactly the Issue consists of. -->
 <!-- Please try to write as much as possible. "it doesn't work" is not sufficient. -->

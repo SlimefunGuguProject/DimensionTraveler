@@ -1,10 +1,14 @@
 package idv.hailelectronic.dimensiontraveler;
 
+import idv.hailelectronic.dimensiontraveler.dimensions.MirrorOfTheVoid;
 import idv.hailelectronic.dimensiontraveler.items.DenyUse;
 import io.github.thebusybiscuit.slimefun4.api.researches.Research;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,36 +31,60 @@ public class DimensionTraveler extends JavaPlugin implements SlimefunAddon {
             // You could start an Auto-Updater for example
         //}
         //Category
-        ItemStack itemGroupItem = new CustomItemStack(Material.BASALT, "&b&k|||&r&b维度旅者&k|||", "");
+        ItemStack itemGroupItem = new CustomItemStack(Material.BASALT, "&b&k|||&r&b维度旅者&k|||");
         NamespacedKey itemGroupId = new NamespacedKey(this, "dimension_traveler");
-        //Item
-        //  Raw Cast Slate
         ItemGroup itemGroup = new ItemGroup(itemGroupId, itemGroupItem);
-        SlimefunItemStack sfItemRawCastSlate = new SlimefunItemStack("RAW_CAST_SLATE", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZlNDgwNmQxODVhYzA4MDNjMjMyNjE5NDFiM2Q0N2M5YzA2NWYyZDJhYmQyYzY2YjFkN2EwYTdkYTM2NjQzMCJ9fX0=", "&7未烧制的铸石", "&6Basic material","&8&ndimension_traveler:raw_cast_slate");
-        ItemStack[] recipeRawCastSlate = { new ItemStack(Material.BASALT), new ItemStack(Material.BASALT), new ItemStack(Material.BASALT), SlimefunItems.IRON_DUST, new ItemStack(Material.DIAMOND), SlimefunItems.IRON_DUST, new ItemStack(Material.BASALT), new ItemStack(Material.BASALT), new ItemStack(Material.BASALT) };
-        SlimefunItem itemRawCastSlate = new SlimefunItem(itemGroup, sfItemRawCastSlate, RecipeType.ENHANCED_CRAFTING_TABLE, recipeRawCastSlate,new SlimefunItemStack(sfItemRawCastSlate,8));
-        itemRawCastSlate.register(this);
+        //Item
+        //  Basalt Fragments
+        SlimefunItemStack sfItemBasaltFragments = new SlimefunItemStack("BASALT_FRAGMENTS", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2ZlNDgwNmQxODVhYzA4MDNjMjMyNjE5NDFiM2Q0N2M5YzA2NWYyZDJhYmQyYzY2YjFkN2EwYTdkYTM2NjQzMCJ9fX0=", "&7玄武岩碎块", "&6Basic material","&8&ndimension_traveler:basalt_fragments");
+        ItemStack[] recipeBasaltFragments = { new ItemStack(Material.BASALT)};
+        SlimefunItem itemBasaltFragments = new SlimefunItem(itemGroup, sfItemBasaltFragments, RecipeType.GRIND_STONE, recipeBasaltFragments,new SlimefunItemStack(sfItemBasaltFragments,8));
+        itemBasaltFragments.register(this);
         //  Cast Slate
         SlimefunItemStack sfItemCastSlate = new SlimefunItemStack("CAST_SLATE", Material.DRIED_KELP, "&7铸石板", "&6Basic material","&8&ndimension_traveler:cast_slate");
-        ItemStack[] recipeCastSlate = { getItem("RAW_CAST_SLATE")};
-        DenyUse itemCastSlate = new DenyUse(itemGroup, sfItemCastSlate, RecipeType.SMELTERY, recipeCastSlate);
+        ItemStack[] recipeCastSlate = { getItem("BASALT_FRAGMENTS"),SlimefunItems.IRON_DUST};
+        DenyUse itemCastSlate = new DenyUse(itemGroup, sfItemCastSlate, RecipeType.HEATED_PRESSURE_CHAMBER, recipeCastSlate);
         itemCastSlate.register(this);
+        //  Dimension Fragments
+        SlimefunItemStack sfItemDimensionFragments = new SlimefunItemStack("DIMENSION_FRAGMENTS", Material.PRISMARINE_SHARD, "&9维度碎片", "&6Basic material","&8&ndimension_traveler:dimension_fragments");
+        ItemStack[] recipeDimensionFragments = { new ItemStack(Material.ENDER_PEARL)};
+        SlimefunItem itemDimensionFragments = new SlimefunItem(itemGroup, sfItemDimensionFragments, RecipeType.GRIND_STONE, recipeDimensionFragments,new SlimefunItemStack(sfItemDimensionFragments,4));
+        itemDimensionFragments.register(this);
         //  Dimension Gem
         SlimefunItemStack sfItemDimensionGem = new SlimefunItemStack("DIMENSION_GEM", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiJ9fX0=", "&9维度宝石", "&6Basic material","&8&ndimension_traveler:dimension_gem");
-        ItemStack[] recipeDimensionGem = { null,new ItemStack(Material.ENDER_PEARL),null,new ItemStack(Material.ENDER_PEARL),new ItemStack(Material.DIAMOND),new ItemStack(Material.ENDER_PEARL),null,new ItemStack(Material.ENDER_PEARL),null };
-        SlimefunItem itemDimensionGem = new SlimefunItem(itemGroup, sfItemDimensionGem, RecipeType.ENHANCED_CRAFTING_TABLE, recipeDimensionGem);
+        ItemStack[] recipeDimensionGem = { SlimefunItems.MAGIC_LUMP_3,getItem("DIMENSION_FRAGMENTS"),SlimefunItems.ENDER_LUMP_3,getItem("DIMENSION_FRAGMENTS"),new ItemStack(Material.DIAMOND),getItem("DIMENSION_FRAGMENTS"),SlimefunItems.ENDER_LUMP_3,getItem("DIMENSION_FRAGMENTS"),SlimefunItems.MAGIC_LUMP_3 };
+        SlimefunItem itemDimensionGem = new SlimefunItem(itemGroup, sfItemDimensionGem, RecipeType.MAGIC_WORKBENCH, recipeDimensionGem);
         itemDimensionGem.register(this);
         //  Portal Controller
         SlimefunItemStack sfItemPortalController = new SlimefunItemStack("PORTAL_CONTROLLER", Material.LODESTONE, "&e传送门控制器", "&6Functional Block","&8&ndimension_traveler:portal_controller");
         ItemStack[] recipePortalController = { getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("DIMENSION_GEM"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE")};
         SlimefunItem itemPortalController = new SlimefunItem(itemGroup, sfItemPortalController, RecipeType.ENHANCED_CRAFTING_TABLE, recipePortalController);
         itemPortalController.register(this);
+        //  Thin Cloud
+        SlimefunItemStack sfItemThinCloud = new SlimefunItemStack("THIN_CLOUD", Material.WHITE_STAINED_GLASS, "&f轻薄的云", "&6Basic material","&8&ndimension_traveler:thin_cloud");
+        ItemStack[] recipeThinCloud = { getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("DIMENSION_GEM"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE"),getItem("CAST_SLATE")};
+        SlimefunItem itemThinCloud = new SlimefunItem(itemGroup, sfItemThinCloud, RecipeType.ENHANCED_CRAFTING_TABLE, recipeThinCloud);
+        itemThinCloud.register(this);
         //Research
         //  000
-        NamespacedKey beforeEnter =  new NamespacedKey( this , " before_enter " );
-        Research research000 =  new Research(beforeEnter, 730516000 , " Before enter " , 15 );
-        research000.addItems(itemRawCastSlate,itemCastSlate,itemDimensionGem,itemPortalController);
+        NamespacedKey beforeEnter =  new NamespacedKey( this , "before_enter" );
+        Research research000 =  new Research(beforeEnter, 730516000 , "启程前 Before enter" , 15 );
+        research000.addItems(itemBasaltFragments,itemCastSlate,itemDimensionFragments,itemDimensionGem,itemPortalController);
         research000.register();
+        //  001
+        NamespacedKey firstEnteringForeignLand =  new NamespacedKey( this , "first_entering_foreign_land" );
+        Research research001 =  new Research(firstEnteringForeignLand, 730516001 , "初入异境 First entering foreign land" , 20 );
+        research001.addItems(itemThinCloud);
+        research001.register();
+        //Dimension
+        /*Copy from DynaTech:
+         *https://github.com/ProfElements/DynaTech/blob/master/src/main/java/me/profelements/dynatech/DynaTech.java
+         * Line:48~51
+         */
+        WorldCreator worldCreator = new WorldCreator("mirrorOfTheVoid");
+        worldCreator.generator(new MirrorOfTheVoid());
+        World mirrorOfTheVoid = worldCreator.createWorld();
+        new BlockStorage(mirrorOfTheVoid);
     }
 
     @Override
@@ -82,7 +110,7 @@ public class DimensionTraveler extends JavaPlugin implements SlimefunAddon {
      *https://github.com/TheBusyBiscuit/ExoticGarden/blob/master/src/main/java/io/github/thebusybiscuit/exoticgarden/ExoticGarden.java
      * Line:332~336
      */
-    private static ItemStack getItem(String id) {
+    static ItemStack getItem(String id) {
         SlimefunItem item = SlimefunItem.getById(id);
         return item != null ? item.getItem() : null;
     }
